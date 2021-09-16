@@ -1,0 +1,29 @@
+{
+  "name": "discord-music-bot",
+  "version": "1.0.0",
+  "description": "A music bot for discord",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "keywords": [
+    "discord",
+    "music",
+    "bot"
+  ],
+  "author": "joaogsleite",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.9.1",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.6.0",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "sodium": "^3.0.2",
+    "ytdl-core": "^4.9.1",
+    "ytsr": "^3.5.3"
+  }
+}
