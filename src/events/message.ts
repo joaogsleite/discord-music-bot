@@ -8,6 +8,8 @@ const client = discord.getClient()
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return
   if (message.content.startsWith('!play')) {
+
+    message.channel.sendTyping()
     
     const voiceChannel = getMemberVoiceChannel(message.member)
     if (!voiceChannel) {
