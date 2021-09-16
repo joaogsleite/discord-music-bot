@@ -2,8 +2,4 @@ version: '3.6'
 
 services:
   nodejs:
-    image: node:16
-    volumes:
-      - ./:/usr/app
-    working_dir: /usr/app
-    command: sh -c 'apt-get update && apt-get install -y ffmpeg && npm install && npm start'
+    build: .

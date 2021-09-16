@@ -1,4 +1,7 @@
 import dotenv from 'dotenv'
+import { Log } from './log'
+
+const log = Log('services/env')
 
 declare global {
   namespace NodeJS {
@@ -13,7 +16,25 @@ declare global {
 
 export async function init() {
   dotenv.config()
-  return process.env
+  const {
+    SSH_SERVER,
+    SSH_FOLDER,
+    DISCORD_TOKEN,
+    DISCORD_CHANNEL,
+  } = process.env
+  const env = {
+    SSH_SERVER,
+    SSH_FOLDER,
+    DISCORD_TOKEN,
+    DISCORD_CHANNEL,
+  }
+  log('env loaded', {
+    SSH_SERVER,
+    SSH_FOLDER,
+    DISCORD_TOKEN,
+    DISCORD_CHANNEL,
+  })
+  return env
 }
 
 export async function getEnv() {

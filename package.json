@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "A music bot for discord",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "compose:up": "docker-compose up -d --build",
+    "compose:down": "docker-compose down",
+    "start": "NODE_PATH=src/ ts-node src/index.ts",
     "deploy": "./scripts/deploy.sh"
   },
   "keywords": [
