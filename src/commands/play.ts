@@ -40,11 +40,12 @@ export async function handler(message: Message, query: string) {
     return
   }
   
-  const videoInfo = await youtube.query(query)
-  if (!videoInfo) {
+  const item = await youtube.query(query)
+  if (!item) {
     message.reply('Youtube video not found')
     return
   }
 
-  player.play(videoInfo)
+  player.play(item)
+  message.reply(`Playing: **${item.title}**`)
 }
