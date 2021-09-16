@@ -11,6 +11,8 @@ let timeout: NodeJS.Timeout
 
 const commandNames = fs.readdirSync(__dirname).map((file) => {
   return file.split('.')[0]
+}).filter((commandName) => {
+  return commandName !== 'index'
 })
 const commandHandlers: Record<string, any> = {}
 commandNames.forEach(async (commandName) => {
@@ -27,8 +29,7 @@ client.on('messageCreate', async (message) => {
         processingMessage = true
         timeout = setTimeout(() => {
           processingMessage = false
-        }, 5000)
-        message.channel.sendTyping()
+        }, 5000) 
         const arg = message.content.substr(1 + commandName.length).trim()
         await commandHandlers[commandName](message, arg)
         clearInterval(timeout)

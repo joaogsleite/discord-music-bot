@@ -4,6 +4,11 @@ import { Log } from './log'
 
 const log = Log('services/youtube')
 
+export interface IPlayItem {
+  title: string
+  url: string
+}
+
 export async function query(value: string) {
   log('query', query)
   try {
@@ -23,16 +28,18 @@ export function createStream(url: string) {
   return ytdl.default(url)
 }
 
-async function getInfoFromUrl(url: string) {
+async function getInfoFromUrl(url: string): Promise<IPlayItem | undefined> {
   log('get info', url)
   const info = await ytdl.getInfo(url)
-  return {
-    title: info.videoDetails.title,
-    url: info.videoDetails.video_url,
-  } 
+  if (info) {
+    return {
+      title: info.videoDetails.title,
+      url: info.videoDetails.video_url,
+    } 
+  }
 }
 
-async function search(query: string) {
+async function search(query: string): Promise<IPlayItem | undefined> {
   log('search', query)
   const filters = await ytsr.getFilters(query)
   const filter = filters.get('Type')?.get('Video')

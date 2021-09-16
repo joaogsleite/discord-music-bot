@@ -1,5 +1,7 @@
 import { Message } from "discord.js"
-import * as voiceService from 'services/voice'
+import * as player from 'services/player'
+import * as connectionService from 'services/connection'
+import * as queueService from 'services/queue'
 import * as youtube from 'services/youtube'
 import { Log } from 'services/log'
 import { getMemberVoiceChannel } from 'utils/discord'
@@ -7,6 +9,7 @@ import { getMemberVoiceChannel } from 'utils/discord'
 const log = Log('commands/play')
 
 export async function handler(message: Message, query: string) {
+  message.channel.sendTyping()
   const voiceChannel = getMemberVoiceChannel(message.member)
   if (!voiceChannel) {
     message.reply('Please join a voice channel')
@@ -14,7 +17,8 @@ export async function handler(message: Message, query: string) {
   }
 
   try {
-    voiceService.join(voiceChannel)
+    const textChannel = message.channel
+    connectionService.join(voiceChannel, textChannel)
   } catch (error) {
     log('error joining', error)
     message.reply('Error joining the voice channel')
@@ -22,6 +26,16 @@ export async function handler(message: Message, query: string) {
   }
   
   if (!query) {
+    if (player.isPaused()) {
+      player.play()
+      return
+    }
+    const item = queueService.dequeue()
+    if (item) {
+      player.play(item)
+      message.reply(`Playing: **${item.title}**`)
+      return
+    }
     message.reply('Usage: !play youtube link or search query')
     return
   }
@@ -32,13 +46,5 @@ export async function handler(message: Message, query: string) {
     return
   }
 
-  try {
-    voiceService.play(videoInfo.url)
-  } catch (error) {
-    log('error playing video', error)
-    message.reply('Error playing the video')
-    return
-  }
-
-  message.reply(`Playing **${videoInfo.title}**`)
+  player.play(videoInfo)
 }
