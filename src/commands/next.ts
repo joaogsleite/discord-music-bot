@@ -1,5 +1,5 @@
 import * as queueService from 'services/queue'
-import * as connectionService from 'services/connection'
+import * as voiceService from 'services/voice'
 import * as player from 'services/player'
 import { Log } from 'services/log'
 import { Message } from 'discord.js'
@@ -15,8 +15,7 @@ export async function handler(message: Message) {
   }
 
   try {
-    const textChannel = message.channel
-    connectionService.join(voiceChannel, textChannel)
+    voiceService.join(voiceChannel)
   } catch (error) {
     log('error joining', error)
     message.reply('Error joining the voice channel')
