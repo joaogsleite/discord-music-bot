@@ -8,6 +8,7 @@ A discord bot for listen to music from youtube
 * Search videos by title 
 * Play videos directly by youtube link 
 * Queue system (add, next, clear)
+* Only listen to commands on specific channel
 * No queue limit
 * No video duration limit
 
