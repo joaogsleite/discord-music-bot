@@ -4,8 +4,6 @@ import { Log } from 'services/log'
 
 const log = Log('commands/index')
 
-const client = discord.getClient()
-
 let processingMessage = false
 let timeout: NodeJS.Timeout
 
@@ -19,8 +17,8 @@ commandNames.forEach(async (commandName) => {
   commandHandlers[commandName] = (await import(`./${commandName}.ts`)).handler
 })
 
-client.on('messageCreate', async (message) => {
-  if (message.author.bot) return
+discord.getClient().on('messageCreate', async (message) => {
+  if (message.author.bot || message.channelId !== discord.getChannel()?.id) return
   log('message received', message.content)
   try {
     if (message.content.startsWith('!')) {
