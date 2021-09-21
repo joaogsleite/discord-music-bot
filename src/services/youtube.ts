@@ -25,7 +25,10 @@ export async function query(value: string) {
 
 export function createStream(url: string) {
   log('creating stream for url', url)
-  const stream = ytdl.default(url, { quality: 'highestaudio' })
+  const stream = ytdl.default(url, { 
+    quality: 'highestaudio',
+    highWaterMark: 1 << 25,
+  })
   log('created stream', !!stream)
   return stream
 }

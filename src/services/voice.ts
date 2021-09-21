@@ -8,7 +8,7 @@ const log = Log('services/voice')
 let connection: VoiceConnection
 
 export function join(channel: VoiceChannel | StageChannel | null) {
-	log('join channel', channel)
+	log('join channel', channel?.name)
 	if (!(channel instanceof VoiceChannel)) return
 	connection = joinVoiceChannel({
 		channelId: channel.id,
