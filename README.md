@@ -42,6 +42,10 @@ Plays the next video from the queue.
 
 Clear all videos from queue.
 
+### `!loop`
+
+Enable or disable loop mode for current item.
+
 ## Deployment
 
 You will need a linux machine (local or VPS) with:
