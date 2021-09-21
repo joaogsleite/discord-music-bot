@@ -40,7 +40,9 @@ export function play(item?: youtube.IPlayItem) {
 			currentResource = createAudioResource(stream)
 			discordPlayer.play(currentResource)
 			discord.setStatus(item.title, 'PLAYING')
+			log('playing')
 		} else {
+			log('unpause')
 			return discordPlayer.unpause()
 		}
 	} catch (error) {

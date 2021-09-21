@@ -12,8 +12,10 @@ export function enqueue(item: IPlayItem) {
 
 export function dequeue() {
   const item = queue.shift()
-  log('removed from queue', item)
-  return item
+  if (item) {
+    log('removed from queue', item)
+    return item
+  }
 }
 
 export function list() {

@@ -15,8 +15,8 @@ export function join(channel: VoiceChannel | StageChannel | null) {
 		guildId: channel.guild.id,
 		adapterCreator: channel.guild.voiceAdapterCreator,
 	})
-	log('connection', connection)
+	log('connection', connection?.joinConfig)
 	const player = playerService.init()
 	connection.subscribe(player)
-	log('connection susbribed player', player)
+	log('subscribed player', player.constructor.name)
 }

@@ -24,8 +24,10 @@ export async function query(value: string) {
 }
 
 export function createStream(url: string) {
-  log('create stream', url)
-  return ytdl.default(url)
+  log('creating stream for url', url)
+  const stream = ytdl.default(url, { quality: 'highestaudio' })
+  log('created stream', !!stream)
+  return stream
 }
 
 async function getInfoFromUrl(url: string): Promise<IPlayItem | undefined> {
@@ -35,25 +37,26 @@ async function getInfoFromUrl(url: string): Promise<IPlayItem | undefined> {
     return {
       title: info.videoDetails.title,
       url: info.videoDetails.video_url,
-    } 
+    }
   }
 }
 
 async function search(query: string): Promise<IPlayItem | undefined> {
-  log('search', query)
+  log('search query', query)
   const filters = await ytsr.getFilters(query)
   const filter = filters.get('Type')?.get('Video')
   if (!filter || !filter.url) {
     throw 'error creating filter'
   }
-  log('filter', filter.url)
+  log('search filter', filter.url)
   const results = await ytsr(filter.url);
   const firstItem = results.items[0]
-  log('result', firstItem)
   if (firstItem.type === 'video') {
-    return {
+    const result = {
       title: firstItem.title,
       url: firstItem.url
     }
+    log('search result', result)
+    return result
   }
 }
