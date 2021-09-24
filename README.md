@@ -1,6 +1,6 @@
 # Discord Music Bot
 
-A discord bot for listen to music from youtube
+A discord bot for listening to music from youtube
 
 ## Features
 
