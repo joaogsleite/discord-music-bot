@@ -6,6 +6,6 @@ source ../.env
 
 cd ..
 
-ssh $SSH_SERVER "mkdir -p $SSH_FOLDER"
-scp -r tsconfig.json package.json Dockerfile docker-compose.yml .env src/ $SSH_SERVER:$SSH_FOLDER/
-ssh $SSH_SERVER "cd $SSH_FOLDER && docker-compose down && docker-compose up -d --build"
+ssh -p $SSH_PORT $SSH_SERVER "mkdir -p $SSH_FOLDER"
+scp -P $SSH_PORT -r tsconfig.json package.json Dockerfile docker-compose.yml .env src/ $SSH_SERVER:$SSH_FOLDER/
+ssh -p $SSH_PORT $SSH_SERVER "cd $SSH_FOLDER && docker-compose down && docker-compose up -d --build"

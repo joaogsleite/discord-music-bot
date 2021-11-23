@@ -13,7 +13,7 @@ export function join(channel: VoiceChannel | StageChannel | null) {
 	connection = joinVoiceChannel({
 		channelId: channel.id,
 		guildId: channel.guild.id,
-		adapterCreator: channel.guild.voiceAdapterCreator,
+		adapterCreator: channel.guild.voiceAdapterCreator as any,
 	})
 	log('connection', connection?.joinConfig)
 	const player = playerService.init()

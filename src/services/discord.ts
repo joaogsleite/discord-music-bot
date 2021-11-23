@@ -35,7 +35,7 @@ export function sendMessage(msg: string) {
 }
 
 export function setStatus(status = '', type: ActivityType = 'CUSTOM') {
-  client?.user?.setActivity(status, { type })
+  client?.user?.setActivity(status, { type: type as any })
 }
 
 export function getClient() {
