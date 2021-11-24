@@ -9,15 +9,24 @@ const log = Log('services/player')
 let discordPlayer: AudioPlayer
 let paused = false
 let loop = false
+let related = false
 let playing: youtube.IPlayItem | undefined
 let currentResource: AudioResource<null>
 
 export function init() {
 	if (!discordPlayer) {
 		discordPlayer = createAudioPlayer()
+		discord.setStatus('Waiting for commands...')
 	}
 	checkQueue()
   return discordPlayer
+}
+
+export function getRelated() {
+	return related
+}
+export function setRelated(value: boolean) {
+	related = value
 }
 
 export function getLoop() {
@@ -26,8 +35,11 @@ export function getLoop() {
 export function setLoop(value: boolean) {
 	loop = value
 }
+export function getPlaying() {
+	return playing
+}
 
-function checkQueue() {
+async function checkQueue() {
 	if (currentResource && currentResource.ended) {
 		if (loop) {
 			play(playing)
@@ -36,6 +48,13 @@ function checkQueue() {
 			if (item) {
 				discord.sendMessage(`Playing **${item.title}**`)
 				play(item)
+			} else if (playing && related) {
+					const relatedItems = await youtube.related(playing)
+					const next = relatedItems[0]
+					if (next) {
+						discord.sendMessage(`Playing **${next.title}**`)
+						play(next)
+					}
 			} else {
 				discord.setStatus('Waiting for commands...')
 				playing = undefined

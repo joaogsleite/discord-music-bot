@@ -39,12 +39,24 @@ export async function handler(message: Message, query: string) {
     return
   }
   
-  const item = await youtube.query(query)
-  if (!item) {
+  const result = await youtube.query(query)
+  if (!result) {
     message.reply('Youtube video not found')
     return
   }
 
-  player.play(item)
-  message.reply(`Playing: **${item.title}**`)
+  if (Array.isArray(result)) {
+    const item = result.shift()
+    if (!item) {
+      message.reply('Youtube video not found')
+      return
+    }
+    player.play(item)
+    queueService.enqueue(result)
+    message.reply(`Added ${result.length} items to queue and playing: **${item.title}**`)
+    return
+  }
+
+  player.play(result)
+  message.reply(`Playing: **${result.title}**`)
 }

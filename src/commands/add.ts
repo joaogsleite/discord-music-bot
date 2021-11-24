@@ -7,12 +7,20 @@ const log = Log('commands/add')
 
 export async function handler(message: Message, query: string) {
   message.channel.sendTyping()
-  const item = await youtube.query(query)
-  if (!item) {
+
+  const result = await youtube.query(query)
+  if (!result) {
     message.reply('Youtube video not found')
     return
   }
-  queueService.enqueue(item)
-  message.reply(`Added to queue: **${item.title}**`)
-  log('added to queue', item)
+
+  queueService.enqueue(result)
+
+  if (Array.isArray(result)) {
+    message.reply(`Added ${result.length} items to queue`)
+  } else {
+    message.reply(`Added to queue: **${result.title}**`)
+  }
+
+  log('added to queue', result)
 }

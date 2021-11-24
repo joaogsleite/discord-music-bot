@@ -5,8 +5,12 @@ const log = Log('services/queue')
 
 let queue: IPlayItem[] = []
 
-export function enqueue(item: IPlayItem) {
-  queue.push(item)
+export function enqueue(item: IPlayItem | IPlayItem[]) {
+  if (Array.isArray(item)) {
+    queue = queue.concat(item)
+  } else {
+    queue.push(item)
+  }
   log('added to queue', item)
 }
 

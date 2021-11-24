@@ -1,4 +1,5 @@
 import * as ytdl from 'ytdl-core'
+import ytpl from 'ytpl'
 import ytsr from 'ytsr'
 import { Log } from './log'
 
@@ -33,15 +34,49 @@ export function createStream(url: string) {
   return stream
 }
 
-async function getInfoFromUrl(url: string): Promise<IPlayItem | undefined> {
+async function getInfoFromUrl(url: string): Promise<IPlayItem | IPlayItem[] | undefined> {
   log('get info', url)
-  const info = await ytdl.getInfo(url)
-  if (info) {
-    return {
-      title: info.videoDetails.title,
-      url: info.videoDetails.video_url,
+  if (url.includes('list=')) {
+    const playlist = await ytpl(url)
+    return playlist.items.map((video) => ({
+      title: video.title,
+      url: video.shortUrl
+    }))
+
+  } else {
+    const info = await ytdl.getInfo(url)
+    if (info) {
+      return {
+        title: info.videoDetails.title,
+        url: info.videoDetails.video_url,
+      }
     }
   }
+  
+}
+
+export async function related(original: IPlayItem): Promise<IPlayItem[]> {
+  const filters = await ytsr.getFilters(original.url)
+  const filter = filters.get('Type')?.get('Video')
+  if (!filter || !filter.url) {
+    return []
+  }
+  const result = await ytsr(filter.url) as any
+  if (result && result.items && result.items[1]) {
+    let items: Record<string, any>[]
+    if (result.items[1].items && Array.isArray(result.items[1].items)) {
+      items = result.items[1].items
+    } else {
+      items = result.items
+    }
+    return items.filter((item) => {
+      return item.title && item.url && !original.url.includes(item.id)
+    }).map((item) => ({
+      title: item.title as string,
+      url: item.url as string,
+    }))
+  }
+  return []
 }
 
 async function search(query: string): Promise<IPlayItem | undefined> {
