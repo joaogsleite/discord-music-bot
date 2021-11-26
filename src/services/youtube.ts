@@ -30,6 +30,9 @@ export function createStream(url: string) {
     quality: 'highestaudio',
     highWaterMark: 1 << 25,
   })
+  stream.on('error', (error) => {
+    log('stream error', error)
+  })
   log('created stream', !!stream)
   return stream
 }

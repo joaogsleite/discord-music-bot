@@ -26,7 +26,7 @@ export async function handler(message: Message) {
   const item = queueService.dequeue()
   if (item) {
     player.play(item)
-    message.reply(`Playing: **${item.title}**`)
+    message.reply(`Playing **${item.title}**`)
     log('from queue', item)
   } else if (player.getRelated()) {
     const playing = player.getPlaying()
@@ -35,7 +35,7 @@ export async function handler(message: Message) {
       const items = await youtube.related(playing)
       if (items[0]) {
         player.play(items[0])
-        message.reply(`Playing: **${items[0].title}**`)
+        message.reply(`Playing **${items[0].title}**`)
       } else {
         message.reply(`Error getting related videos for **${playing.title}**`)
       }

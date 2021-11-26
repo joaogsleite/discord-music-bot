@@ -32,7 +32,7 @@ export async function handler(message: Message, query: string) {
     const item = queueService.dequeue()
     if (item) {
       player.play(item)
-      message.reply(`Playing: **${item.title}**`)
+      message.reply(`Playing **${item.title}**`)
       return
     }
     message.reply('Usage: !play youtube link or search query')
@@ -53,10 +53,10 @@ export async function handler(message: Message, query: string) {
     }
     player.play(item)
     queueService.enqueue(result)
-    message.reply(`Added ${result.length} items to queue and playing: **${item.title}**`)
+    message.reply(`Added ${result.length} items to queue and playing **${item.title}**`)
     return
   }
 
   player.play(result)
-  message.reply(`Playing: **${result.title}**`)
+  message.reply(`Playing **${result.title}**`)
 }
