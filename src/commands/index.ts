@@ -14,7 +14,7 @@ const commandNames = fs.readdirSync(__dirname).map((file) => {
 })
 const commandHandlers: Record<string, any> = {}
 commandNames.forEach(async (commandName) => {
-  commandHandlers[commandName] = (await import(`./${commandName}.ts`)).handler
+  commandHandlers[commandName] = (await import(`./${commandName}`)).handler
 })
 
 discord.getClient().on('messageCreate', async (message) => {

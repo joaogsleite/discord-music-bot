@@ -10,6 +10,7 @@ declare global {
       SSH_FOLDER: string
       DISCORD_TOKEN: string
       DISCORD_CHANNEL: string
+      DISCORD_GUILD: string
     }
   }
 }
@@ -21,18 +22,21 @@ export async function init() {
     SSH_FOLDER,
     DISCORD_TOKEN,
     DISCORD_CHANNEL,
+    DISCORD_GUILD,
   } = process.env
   const env = {
     SSH_SERVER,
     SSH_FOLDER,
     DISCORD_TOKEN,
     DISCORD_CHANNEL,
+    DISCORD_GUILD,
   }
   log('env loaded', {
     SSH_SERVER,
     SSH_FOLDER,
     DISCORD_TOKEN,
     DISCORD_CHANNEL,
+    DISCORD_GUILD,
   })
   return env
 }
