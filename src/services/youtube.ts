@@ -30,10 +30,15 @@ export function createStream(url: string) {
     quality: 'highestaudio',
     highWaterMark: 1 << 25,
   })
+  log('created stream', !!stream)
+  const funcs = stream.listeners('error') as Array<() => void>
+  funcs.forEach((func) => {
+    stream.removeListener('error', func)
+  })
   stream.on('error', (error) => {
     log('stream error', error)
+    stream.destroy()
   })
-  log('created stream', !!stream)
   return stream
 }
 
