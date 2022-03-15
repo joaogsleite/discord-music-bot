@@ -4,6 +4,7 @@ import { Log } from 'services/log'
 const log = Log('services/queue')
 
 let queue: IPlayItem[] = []
+let random: boolean = false
 
 export function enqueue(item: IPlayItem | IPlayItem[]) {
   if (Array.isArray(item)) {
@@ -15,11 +16,22 @@ export function enqueue(item: IPlayItem | IPlayItem[]) {
 }
 
 export function dequeue() {
-  const item = queue.shift()
+  const index = random
+    ? Math.floor(Math.random() * queue.length)
+    : 0
+  const item = queue.splice(index, 1)[0]
   if (item) {
     log('removed from queue', item)
     return item
   }
+}
+
+export function setRandom(enabled: boolean) {
+  random = enabled
+}
+
+export function getRandom() {
+  return random
 }
 
 export function list() {
