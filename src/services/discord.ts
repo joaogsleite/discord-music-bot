@@ -1,9 +1,9 @@
-import { ActivityType, Client, Guild, TextBasedChannels } from 'discord.js'
+import { ActivityType, Client, Guild, TextBasedChannel } from 'discord.js'
 import { Log } from './log'
 
 const log = Log('services/discord')
 
-let channel: TextBasedChannels | null
+let textChannel: TextBasedChannel | null
 let guild: Guild
 let client: Client
 
@@ -24,7 +24,7 @@ export async function init() {
   await client.login(DISCORD_TOKEN)
   let fetchedChannel = await client.channels.fetch(DISCORD_CHANNEL)
   if (fetchedChannel?.isText()) {
-    channel = fetchedChannel
+    textChannel = fetchedChannel
   }
 
   const oauth2guilds = await (await client.guilds.fetch()).values()
@@ -39,7 +39,7 @@ export async function init() {
 }
 
 export function sendMessage(msg: string) {
-  channel?.send(msg)
+  textChannel?.send(msg)
 }
 
 export function setStatus(status = '', type: ActivityType = 'CUSTOM') {
@@ -50,8 +50,12 @@ export function getClient() {
   return client
 }
 
-export function getChannel() {
-  return channel
+export function getTextChannel() {
+  return textChannel
+}
+
+export function getVoiceChannel(id: string) {
+  return client.channels.fetch(id)
 }
 
 export function getGuild() {

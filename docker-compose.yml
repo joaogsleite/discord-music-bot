@@ -4,3 +4,7 @@ services:
   nodejs:
     build: .
     restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./state.json
+        target: /usr/src/app/state.json
