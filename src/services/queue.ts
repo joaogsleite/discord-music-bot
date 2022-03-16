@@ -4,7 +4,8 @@ import { Log } from 'services/log'
 const log = Log('services/queue')
 
 let queue: IPlayItem[] = []
-let random: boolean = false
+let random = false
+let loop = false
 
 export function enqueue(item: IPlayItem | IPlayItem[]) {
   if (Array.isArray(item)) {
@@ -22,6 +23,9 @@ export function dequeue() {
   const item = queue.splice(index, 1)[0]
   if (item) {
     log('removed from queue', item)
+    if (loop) {
+      queue.push(item)
+    }
     return item
   }
 }
@@ -29,9 +33,15 @@ export function dequeue() {
 export function setRandom(enabled: boolean) {
   random = enabled
 }
-
 export function getRandom() {
   return random
+}
+
+export function setLoop(enabled: boolean) {
+  loop = enabled
+}
+export function getLoop() {
+  return loop
 }
 
 export function list() {

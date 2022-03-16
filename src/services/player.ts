@@ -8,7 +8,7 @@ const log = Log('services/player')
 
 let discordPlayer: AudioPlayer
 let paused = false
-let loop = false
+let repeat = false
 let related = false
 let playing: youtube.IPlayItem | undefined
 let currentResource: AudioResource<null>
@@ -29,11 +29,11 @@ export function setRelated(value: boolean) {
 	related = value
 }
 
-export function getLoop() {
-	return loop
+export function getRepeat() {
+	return repeat
 }
-export function setLoop(value: boolean) {
-	loop = value
+export function setRepeat(value: boolean) {
+	repeat = value
 }
 export function getPlaying() {
 	return playing
@@ -41,7 +41,7 @@ export function getPlaying() {
 
 async function checkQueue() {
 	if (currentResource && currentResource.ended) {
-		if (loop) {
+		if (repeat) {
 			play(playing)
 		} else {
 			const item = queueService.dequeue()

@@ -44,7 +44,15 @@ Clear all videos from queue.
 
 ### `!loop`
 
-Enable or disable loop mode for current item.
+Enable or disable loop mode for queue.
+
+### `!random`
+
+Enable or disable random mode for queue.
+
+### `!repeat`
+
+Enable or disable repeat mode for current item.
 
 ## Deployment
 

@@ -5,16 +5,24 @@ import * as voiceService from './voice'
 import * as queueService from './queue'
 import { VoiceChannel } from 'discord.js'
 import { Log } from './log'
+import { IPlayItem } from './youtube'
 
 const log = Log('services/state')
 
 const FILE_PATH = __dirname + '/../../state.json'
 const SAVE_INTERVAL = 10_000
 
+export interface IState {
+  voiceChannelId?: string
+  playlist?: IPlayItem[]
+  loop?: boolean
+  random?: boolean
+}
+
 export async function restore() {
   log('starting restore')
   try {
-    const state = JSON.parse(await fs.readFile(FILE_PATH, 'utf-8'))
+    const state = JSON.parse(await fs.readFile(FILE_PATH, 'utf-8')) as IState
     log('state', state)
     const textChannel = discord.getTextChannel()
     if (!state.voiceChannelId)
@@ -26,8 +34,9 @@ export async function restore() {
     log('joining voice channel', voiceChannel.name)
     voiceService.join(voiceChannel)
 
-    queueService.enqueue(state.playlist)
-    queueService.setRandom(state.random)
+    queueService.enqueue(state.playlist || [])
+    queueService.setRandom(state.random || false)
+    queueService.setLoop(state.loop || false)
     log('restored queueService state')
 
     const item = queueService.dequeue()
@@ -49,6 +58,7 @@ async function save() {
       voiceChannelId: voiceService.getVoiceChannelId(),
       playlist: queueService.list(),
       random: queueService.getRandom(),
+      loop: queueService.getLoop()
     }
     log('writeFile', state)
     await fs.writeFile(FILE_PATH, JSON.stringify(state, null, 2), 'utf-8')
