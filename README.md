@@ -1,12 +1,13 @@
 # Discord Music Bot
 
-A discord bot for listening to music from youtube
+A discord bot for listening to music from Youtube and Soundcloud
 
 ## Features
 
-* Play videos from youtube on your voice channel
+* Play videos from Youtube and Soundcloud on your voice channel
 * Search videos by title 
 * Play videos directly by youtube link 
+* Play Soundcloud links 
 * Queue system (add, next, clear)
 * Only listen to commands on specific channel
 * Currently playing is displayed on Discord bot status
@@ -18,7 +19,7 @@ A discord bot for listening to music from youtube
 
 ### `!play <query>` or `!play <link>`
 
-Starts playing a youtube video.
+Starts playing a Youtube video or Soundcloud audio.
 If you pass a custom search string, it will first search for the video on youtube.
 Then, it will play the video on your current voice channel.
 
@@ -29,6 +30,10 @@ Pauses the current video.
 ### `!add <query>` or `!add <link>`
 
 Adds the video to the queue.
+
+Supports links from Youtube and Soundcloud.
+
+Supports search query on Youtube.
 
 ### `!queue`
 
@@ -85,7 +90,8 @@ Folder structure:
   * `discord`: service to handle discord API
   * `connection`: service to save voice and text channel state
   * `player`: service to handle player/stream
-  * `youtube`: service to handle youtube search and download
+  * `metadata`: service to handle Youtube and Soundcloud search
+  * `stream`: service to handle download stream from Youtube and Soundcloud
   * `queue`: service to store queue state
 * `src/index.ts`: entrypoint
 
