@@ -1,7 +1,8 @@
 import { AudioPlayer, AudioResource, createAudioPlayer, createAudioResource } from '@discordjs/voice'
 import * as discord from './discord'
 import * as queueService from './queue'
-import * as youtube from './youtube'
+import * as metadata from './metadata'
+import { createStream } from './stream'
 import { Log } from './log'
 
 const log = Log('services/player')
@@ -10,7 +11,7 @@ let discordPlayer: AudioPlayer
 let paused = false
 let repeat = false
 let related = false
-let playing: youtube.IPlayItem | undefined
+let playing: metadata.IPlayItem | undefined
 let currentResource: AudioResource<null>
 
 export function init() {
@@ -42,18 +43,18 @@ export function getPlaying() {
 async function checkQueue() {
 	if (currentResource && currentResource.ended) {
 		if (repeat) {
-			play(playing)
+			await play(playing)
 		} else {
 			const item = queueService.dequeue()
 			if (item) {
 				discord.sendMessage(`Playing **${item.title}**`)
-				play(item)
+				await play(item)
 			} else if (playing && related) {
-					const relatedItems = await youtube.related(playing)
+					const relatedItems = await metadata.related(playing)
 					const next = relatedItems[0]
 					if (next) {
 						discord.sendMessage(`Playing **${next.title}**`)
-						play(next)
+						await play(next)
 					}
 			} else {
 				discord.setStatus('Waiting for commands...')
@@ -64,12 +65,12 @@ async function checkQueue() {
 	setTimeout(checkQueue, 3000)
 }
 
-export function play(item?: youtube.IPlayItem) {
+export async function play(item?: metadata.IPlayItem) {
 	log('play', item)
 	paused = false
 	try {
 		if (item) {
-			const stream = youtube.createStream(item.url)
+			const stream = await createStream(item.url)
 			currentResource = createAudioResource(stream)
 			discordPlayer.play(currentResource)
 			playing = item

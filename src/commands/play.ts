@@ -2,7 +2,7 @@ import { Message } from "discord.js"
 import * as player from 'services/player'
 import * as voiceService from 'services/voice'
 import * as queueService from 'services/queue'
-import * as youtube from 'services/youtube'
+import * as metadata from 'services/metadata'
 import { Log } from 'services/log'
 import { getMemberVoiceChannel } from 'utils/discord'
 
@@ -26,12 +26,12 @@ export async function handler(message: Message, query: string) {
   
   if (!query) {
     if (player.isPaused()) {
-      player.play()
+      await player.play()
       return
     }
     const item = queueService.dequeue()
     if (item) {
-      player.play(item)
+      await player.play(item)
       message.reply(`Playing **${item.title}**`)
       return
     }
@@ -39,7 +39,7 @@ export async function handler(message: Message, query: string) {
     return
   }
   
-  const result = await youtube.query(query)
+  const result = await metadata.query(query)
   if (!result) {
     message.reply('Youtube video not found')
     return
@@ -51,12 +51,12 @@ export async function handler(message: Message, query: string) {
       message.reply('Youtube video not found')
       return
     }
-    player.play(item)
+    await player.play(item)
     queueService.enqueue(result)
     message.reply(`Added ${result.length} items to queue and playing **${item.title}**`)
     return
   }
 
-  player.play(result)
+  await player.play(result)
   message.reply(`Playing **${result.title}**`)
 }

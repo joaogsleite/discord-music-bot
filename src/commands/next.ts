@@ -1,7 +1,7 @@
 import * as queueService from 'services/queue'
 import * as voiceService from 'services/voice'
 import * as player from 'services/player'
-import * as youtube from 'services/youtube'
+import * as metadata from 'services/metadata'
 import { Log } from 'services/log'
 import { Message } from 'discord.js'
 import { getMemberVoiceChannel } from 'utils/discord'
@@ -25,16 +25,16 @@ export async function handler(message: Message) {
   
   const item = queueService.dequeue()
   if (item) {
-    player.play(item)
+    await player.play(item)
     message.reply(`Playing **${item.title}**`)
     log('from queue', item)
   } else if (player.getRelated()) {
     const playing = player.getPlaying()
     if (playing) {
       message.channel.sendTyping()
-      const items = await youtube.related(playing)
+      const items = await metadata.related(playing)
       if (items[0]) {
-        player.play(items[0])
+        await player.play(items[0])
         message.reply(`Playing **${items[0].title}**`)
       } else {
         message.reply(`Error getting related videos for **${playing.title}**`)

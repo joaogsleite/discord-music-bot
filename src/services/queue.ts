@@ -1,4 +1,4 @@
-import { IPlayItem } from 'services/youtube'
+import { IPlayItem } from 'services/metadata'
 import { Log } from 'services/log'
 
 const log = Log('services/queue')

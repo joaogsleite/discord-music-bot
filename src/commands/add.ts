@@ -1,5 +1,5 @@
 import * as queueService from 'services/queue'
-import * as youtube from 'services/youtube'
+import * as metadata from 'services/metadata'
 import { Log } from 'services/log'
 import { Message } from 'discord.js'
 
@@ -8,7 +8,7 @@ const log = Log('commands/add')
 export async function handler(message: Message, query: string) {
   message.channel.sendTyping()
 
-  const result = await youtube.query(query)
+  const result = await metadata.query(query)
   if (!result) {
     message.reply('Youtube video not found')
     return

@@ -5,7 +5,7 @@ import * as voiceService from './voice'
 import * as queueService from './queue'
 import { VoiceChannel } from 'discord.js'
 import { Log } from './log'
-import { IPlayItem } from './youtube'
+import { IPlayItem } from './metadata'
 
 const log = Log('services/state')
 
@@ -53,16 +53,13 @@ export async function restore() {
 
 async function save() {
   try {
-    log('starting save')
     const state = {
       voiceChannelId: voiceService.getVoiceChannelId(),
       playlist: queueService.list(),
       random: queueService.getRandom(),
       loop: queueService.getLoop()
     }
-    log('writeFile', state)
     await fs.writeFile(FILE_PATH, JSON.stringify(state, null, 2), 'utf-8')
-    log('end save')
   } catch (error) {
     log('save error', error)
   }
