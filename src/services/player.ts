@@ -4,6 +4,7 @@ import * as queueService from './queue'
 import * as metadata from './metadata'
 import { createStream } from './stream'
 import { Log } from './log'
+import { sleep } from 'utils/sleep'
 
 const log = Log('services/player')
 
@@ -11,6 +12,7 @@ let discordPlayer: AudioPlayer
 let paused = false
 let repeat = false
 let related = false
+let loading = false
 let playing: metadata.IPlayItem | undefined
 let currentResource: AudioResource<null>
 
@@ -41,20 +43,24 @@ export function getPlaying() {
 }
 
 async function checkQueue() {
-	if (currentResource && currentResource.ended) {
+	if (!loading && currentResource && currentResource.ended) {
 		if (repeat) {
 			await play(playing)
 		} else {
 			const item = queueService.dequeue()
 			if (item) {
-				discord.sendMessage(`Playing **${item.title}**`)
-				await play(item)
+				const playing = await play(item)
+				if (playing) {
+					discord.sendMessage(`Playing **${item.title}**`)
+				}
 			} else if (playing && related) {
 					const relatedItems = await metadata.related(playing)
 					const next = relatedItems[0]
 					if (next) {
-						discord.sendMessage(`Playing **${next.title}**`)
-						await play(next)
+						const playing = await play(next)
+						if (playing) {
+							discord.sendMessage(`Playing **${next.title}**`)
+						}
 					}
 			} else {
 				discord.setStatus('Waiting for commands...')
@@ -68,6 +74,7 @@ async function checkQueue() {
 export async function play(item?: metadata.IPlayItem) {
 	log('play', item)
 	paused = false
+	loading = true
 	try {
 		if (item) {
 			const stream = await createStream(item.url)
@@ -75,14 +82,20 @@ export async function play(item?: metadata.IPlayItem) {
 			discordPlayer.play(currentResource)
 			playing = item
 			discord.setStatus(item.title, 'PLAYING')
+			await sleep(1000)
 			log('playing')
+			loading = false
+			return true
 		} else {
 			log('unpause')
+			loading = false
 			return discordPlayer.unpause()
 		}
 	} catch (error) {
 		log('error playing video', error)
     discord.sendMessage('Error playing the video')
+		loading = false
+		return false
 	}
 }
 
