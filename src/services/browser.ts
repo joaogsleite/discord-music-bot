@@ -2,6 +2,7 @@ import { launch } from 'puppeteer-stream'
 import { Browser } from 'puppeteer'
 import { Log } from './log'
 import { acceptCookies, clickPlay } from 'utils/browser'
+import { sleep } from 'utils/sleep'
 
 const log = Log('services/browser')
 
@@ -51,9 +52,19 @@ export async function scrapeFromPage<T>(url: string, evaluate: () => Promise<T> 
   await page.goto(url, { waitUntil: 'load' })
   await acceptCookies(page)
   const result = await page.evaluate<() => Promise<T> | T>(evaluate)
+  await sleep(1000)
   await page.close()
-  killBrowser(browser)
+  await killBrowser(browser)
   return result
+}
+
+export async function getPageTitle(url: string) {
+  const browser = await openBrowser()
+  const page = await browser.newPage()
+  await page.goto(url, { waitUntil: 'load' })
+  const title = await page.title()
+  await killBrowser(browser)
+  return title
 }
 
 export async function screenshot() {

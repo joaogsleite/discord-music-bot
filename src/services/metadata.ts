@@ -47,9 +47,7 @@ async function getInfoFromUrl(url: string): Promise<IPlayItem | IPlayItem[] | un
       })
     }
   } else {
-    const title = await browser.scrapeFromPage(url, () => {
-      return Promise.resolve(document.title)
-    })
+    const title = await browser.getPageTitle(url)
     return { title, url }
   }
 }
