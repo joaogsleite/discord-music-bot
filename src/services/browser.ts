@@ -1,0 +1,65 @@
+import { launch } from 'puppeteer-stream'
+import { Browser } from 'puppeteer'
+import { Log } from './log'
+import { acceptCookies, clickPlay } from 'utils/browser'
+
+const log = Log('services/browser')
+
+let browser: Browser
+
+async function reOpenBrowser() {
+  await killBrowser(browser)
+  browser = await openBrowser()
+}
+async function killBrowser(browser: Browser) {
+  if (!browser) return
+  const pages = await browser.pages()
+  await Promise.all(pages.map((page) => page.close()))
+  await browser.close()
+}
+async function openBrowser() {
+  const browser = await launch({
+    executablePath: '/usr/bin/brave-browser',
+    userDataDir: `/tmp/brave-browser-${Date.now()}`,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ]
+  })
+  const newPage = await browser.newPage()
+  const pages = await browser.pages()
+  for(const page of pages) {
+    if (page !== newPage) {
+      await page.close()
+    }
+  }
+  return browser
+}
+
+export async function newPage(url: string) {
+  await reOpenBrowser()
+  const page = await browser.newPage()
+  await page.goto(url, { waitUntil: 'networkidle0' })
+  await acceptCookies(page)
+  await clickPlay(page)
+  return page
+}
+
+export async function scrapeFromPage<T>(url: string, evaluate: () => Promise<T> | T) {
+  const browser = await openBrowser()
+  const page = await browser.newPage()
+  await page.goto(url, { waitUntil: 'load' })
+  await acceptCookies(page)
+  const result = await page.evaluate<() => Promise<T> | T>(evaluate)
+  await page.close()
+  killBrowser(browser)
+  return result
+}
+
+export async function screenshot() {
+  const pages = await browser.pages()
+  const page = pages[pages.length - 1]
+  if (page) {
+    return await page.screenshot()
+  }
+}

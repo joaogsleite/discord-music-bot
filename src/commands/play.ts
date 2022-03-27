@@ -17,7 +17,7 @@ export async function handler(message: Message, query: string) {
   }
 
   try {
-    voiceService.join(voiceChannel)
+    await voiceService.join(voiceChannel)
   } catch (error) {
     log('error joining', error)
     message.reply('Error joining the voice channel')

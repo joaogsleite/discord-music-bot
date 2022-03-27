@@ -32,7 +32,7 @@ export async function restore() {
     if (!(voiceChannel instanceof VoiceChannel))
       throw new Error('No valid voice channel')
     log('joining voice channel', voiceChannel.name)
-    voiceService.join(voiceChannel)
+    await voiceService.join(voiceChannel)
 
     queueService.enqueue(state.playlist || [])
     queueService.setRandom(state.random || false)

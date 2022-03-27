@@ -1,5 +1,5 @@
 import { Log } from './log'
-import { soundcloud, youtube } from './stream'
+import * as browser from './browser'
 
 export interface IPlayItem {
   title: string
@@ -9,9 +9,9 @@ export interface IPlayItem {
 const log = Log('services/metadata')
 
 export async function query(value: string) {
-  log('query', query)
+  log('query', value)
   try {
-    if (value.includes('youtube.com/') || value.includes('youtu.be/') || value.includes('soundcloud.com/')) {
+    if (value.includes('http://') || value.includes('https://')) {
       return await getInfoFromUrl(value)
     } else {
       return await search(value)
@@ -24,55 +24,47 @@ export async function query(value: string) {
 
 async function getInfoFromUrl(url: string): Promise<IPlayItem | IPlayItem[] | undefined> {
   log('get info', url)
-  if (url.includes('list=')) {
-    const playlist = await youtube.playlist_info(url)
-    const videos = await playlist.all_videos()
-    return videos.map((video) => ({
-      title: video.title || video.url,
-      url: video.url
-    }))
-  } else if (url.includes('soundcloud.com/')) {
-    const item = await soundcloud.getSongInfo(url)
-    return {
-      title: item.title,
-      url: item.url
+  if ((url.includes('youtube.com') || url.includes('youtu.be')) && url.includes('list=')) {
+    if (url.includes('/watch')) {
+      return await browser.scrapeFromPage(url, () => {
+        const aElems = Array.from(document.getElementsByTagName('a')).filter((a, index, array) => {
+          return !a.classList.contains('ytp-title-channel-name') && (a?.href || '').includes('index=') && index === array.findIndex((found) => {
+            return (found?.href || '') === (a?.href || '')
+          })
+        })
+        return aElems.map((aElem) => ({
+          title: (aElem?.querySelector('#video-title') as HTMLSpanElement)?.innerText,
+          url: aElem.href,
+        }))
+      })
+    } else {
+      return await browser.scrapeFromPage(url, () => {
+        const aElems = Array.from(document.querySelectorAll('a#video-title')) as HTMLAnchorElement[]
+        return aElems.map((aElem) => ({
+          title: aElem.innerText,
+          url: aElem.href,
+        }))
+      })
     }
   } else {
-    const info = await youtube.video_basic_info(url)
-    log('info', info)
-    if (info) {
-      return {
-        title: info.video_details.title || info.video_details.url,
-        url: info.video_details.url,
-      }
-    }
+    const title = await browser.scrapeFromPage(url, () => {
+      return Promise.resolve(document.title)
+    })
+    return { title, url }
   }
-}
-
-export async function related(original: IPlayItem): Promise<IPlayItem[]> {
-  const item = await youtube.video_info(original.url)
-  if (item) {
-    return await Promise.all(
-      item.related_videos.filter((_, index) => {
-        return index < 10
-      }).map((url) => {
-        return getInfoFromUrl(url) as Promise<IPlayItem>
-      })
-    )
-  } 
-  return []
 }
 
 async function search(query: string): Promise<IPlayItem | undefined> {
   log('search query', query)
-  const results = await youtube.search(query)
-  const firstItem = results[0]
-  if (firstItem.type === 'video') {
-    const result = {
-      title: firstItem.title || firstItem.url,
-      url: firstItem.url
+  const searchQuery = query.split(' ').join('+')
+  const url = `https://www.youtube.com/results?search_query=${searchQuery}`
+  const result = await browser.scrapeFromPage(url, () => {
+    const aElems = Array.from(document.querySelectorAll('a#video-title')) as HTMLAnchorElement[]
+    return {
+      title: aElems[0].innerText,
+      url: aElems[0].href
     }
-    log('search result', result)
-    return result
-  }
+  })
+  log('search result', result)
+  return result
 }

@@ -6,6 +6,7 @@
     "compose:up": "docker-compose up -d --build",
     "compose:down": "docker-compose down",
     "start": "NODE_PATH=src/ ts-node src/index.ts",
+    "dev": "docker-compose up --build",
     "deploy": "./scripts/deploy.sh"
   },
   "keywords": [
@@ -24,11 +25,7 @@
     "@discordjs/voice": "^0.8.0",
     "discord.js": "^13.6.0",
     "dotenv": "^10.0.0",
-    "play-dl": "^1.9.2",
-    "sodium": "^3.0.2",
-    "soundcloud-scraper": "^5.0.2",
-    "ytdl-core": "^4.11.0",
-    "ytpl": "^2.2.3",
-    "ytsr": "^3.5.3"
+    "puppeteer-stream": "^2.0.9",
+    "sodium": "^3.0.2"
   }
 }

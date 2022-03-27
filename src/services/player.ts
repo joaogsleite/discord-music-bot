@@ -1,37 +1,37 @@
-import { AudioPlayer, AudioResource, createAudioPlayer, createAudioResource } from '@discordjs/voice'
+import { AudioPlayer, createAudioPlayer } from '@discordjs/voice'
 import * as discord from './discord'
 import * as queueService from './queue'
+import * as browserService from './browser'
 import * as metadata from './metadata'
-import { createStream } from './stream'
 import { Log } from './log'
-import { sleep } from 'utils/sleep'
+import { createAudioResourceFromPage } from 'utils/browser'
 
 const log = Log('services/player')
 
-let discordPlayer: AudioPlayer
 let paused = false
 let repeat = false
 let related = false
 let loading = false
 let playing: metadata.IPlayItem | undefined
-let currentResource: AudioResource<null>
+
+let discordPlayer: AudioPlayer
+
+let audio: HTMLAudioElement | undefined
 
 export function init() {
 	if (!discordPlayer) {
 		discordPlayer = createAudioPlayer()
 		discord.setStatus('Waiting for commands...')
 	}
-	checkQueue()
   return discordPlayer
 }
 
-export function getRelated() {
-	return related
-}
 export function setRelated(value: boolean) {
 	related = value
 }
-
+export function getRelated() {
+	return related
+}
 export function getRepeat() {
 	return repeat
 }
@@ -43,7 +43,8 @@ export function getPlaying() {
 }
 
 async function checkQueue() {
-	if (!loading && currentResource && currentResource.ended) {
+	log('checkQueue')
+	if (!loading) {
 		if (repeat) {
 			await play(playing)
 		} else {
@@ -54,54 +55,49 @@ async function checkQueue() {
 					discord.sendMessage(`Playing **${item.title}**`)
 				}
 			} else if (playing && related) {
-					const relatedItems = await metadata.related(playing)
-					const next = relatedItems[0]
-					if (next) {
-						const playing = await play(next)
-						if (playing) {
-							discord.sendMessage(`Playing **${next.title}**`)
-						}
-					}
+				discord.sendMessage(`Playing related...`)
 			} else {
+				pause()
 				discord.setStatus('Waiting for commands...')
 				playing = undefined
 			}
 		}
 	}
-	setTimeout(checkQueue, 3000)
 }
 
 export async function play(item?: metadata.IPlayItem) {
 	log('play', item)
 	paused = false
 	loading = true
-	try {
-		if (item) {
-			const stream = await createStream(item.url)
-			currentResource = createAudioResource(stream)
-			discordPlayer.play(currentResource)
+	if (item) {
+		try {
+			discordPlayer?.stop(true)
+			const page = await browserService.newPage(item.url)
+			page.on("framenavigated", () => checkQueue())
+			const audioResource = await createAudioResourceFromPage(page)
+			discordPlayer.play(audioResource)
 			playing = item
 			discord.setStatus(item.title, 'PLAYING')
-			await sleep(1000)
-			log('playing')
+			log('playing', audio)
 			loading = false
 			return true
-		} else {
-			log('unpause')
+		} catch (error) {
 			loading = false
-			return discordPlayer.unpause()
+			log('error on play', error)
+			discord.sendMessage('Error playing!')
+			return false
 		}
-	} catch (error) {
-		log('error playing video', error)
-    discord.sendMessage('Error playing the video')
+	} else {
+		log('unpause')
+		audio?.play()
 		loading = false
-		return false
+		return true
 	}
 }
 
 export function pause() {
 	paused = true
-	discordPlayer.pause()
+	audio?.pause()
 }
 
 export function isPaused() {

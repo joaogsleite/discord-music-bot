@@ -1,6 +1,8 @@
 # Discord Music Bot
 
-A discord bot for listening to music from Youtube and Soundcloud
+A discord bot for listening to music from Youtube and Soundcloud.
+
+It uses a Web Browser to open the links and captures the audio output into the Discord BOT.
 
 ## Features
 
@@ -58,6 +60,11 @@ Enable or disable random mode for queue.
 ### `!repeat`
 
 Enable or disable repeat mode for current item.
+
+
+### `!screenshot`
+
+Takes a screenshot of the currently opened link.
 
 ## Deployment
 

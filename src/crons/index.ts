@@ -10,6 +10,6 @@ fs.readdirSync(__dirname).map((file) => {
 }).forEach(async (cronName) => {
   log('Starting', cronName)
   const { handler } = await import(`./${cronName}`)
-  await handler()
+  handler()
   log('Started', cronName)
 })
