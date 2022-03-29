@@ -7,6 +7,7 @@ import { sleep } from 'utils/sleep'
 const log = Log('services/browser')
 
 let browser: Browser
+const UBLOCK_EXT = '/usr/src/app/uBlock0.chromium'
 
 async function reOpenBrowser() {
   await killBrowser(browser)
@@ -20,11 +21,17 @@ async function killBrowser(browser: Browser) {
 }
 async function openBrowser() {
   const browser = await launch({
-    executablePath: '/usr/bin/brave-browser',
-    userDataDir: `/tmp/brave-browser-${Date.now()}`,
+    //executablePath: '/usr/bin/brave-browser',
+    //userDataDir: `/tmp/brave-browser-${Date.now()}`,
+    ignoreDefaultArgs: [
+      '--disable-extensions'
+    ],
     args: [
+      '--disable-dev-shm-usage',
       '--no-sandbox',
-      '--disable-setuid-sandbox'
+      '--disable-setuid-sandbox',
+      '--start-maximized',
+      `--load-extension=${UBLOCK_EXT}`
     ]
   })
   const newPage = await browser.newPage()

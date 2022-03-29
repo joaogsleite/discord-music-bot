@@ -24,6 +24,8 @@ export function getAudioElementFromPage(page: Page) {
 }
 
 export async function acceptCookies(page: Page) {
+  const MATCH = ['youtube.com', 'instagram.com', 'soundcloud.com']
+  if (!MATCH.some((match => page.url().includes(match)))) return
   await sleep(1000)
   await page.evaluate(() => {
     Array.from(document.getElementsByTagName('a')).forEach((a) => {
@@ -44,7 +46,8 @@ export async function acceptCookies(page: Page) {
 export async function clickPlay(page: Page) {
   await sleep(1000)
   await page.evaluate(() => {
-    const videoElem = document.getElementsByTagName('video')[0] as HTMLVideoElement
+    const videos = document.getElementsByTagName('video')
+    const videoElem = videos[videos.length - 1] as HTMLVideoElement
     if (videoElem && videoElem.paused) {
       videoElem.play()
     }
