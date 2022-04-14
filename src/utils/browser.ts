@@ -28,16 +28,15 @@ export async function acceptCookies(page: Page) {
   if (!MATCH.some((match => page.url().includes(match)))) return
   await sleep(1000)
   await page.evaluate(() => {
-    Array.from(document.getElementsByTagName('a')).forEach((a) => {
-      const text = a.innerHTML.toLowerCase()
-      if(text.includes('agree') || text.includes('accept') || text.includes('allow')) {
-        a.click()
-      }
-    })
-    Array.from(document.getElementsByTagName('button')).forEach((a) => {
-      const text = a.innerHTML.toLowerCase()
-      if(text.includes('agree') || text.includes('accept') || text.includes('allow')) {
-        a.click()
+    [
+      ...Array.from(document.getElementsByTagName('a')),
+      ...Array.from(document.getElementsByTagName('button'))
+    ].forEach((elem) => {
+      const text = elem.innerText.toLowerCase();
+      if (['agree', 'accept', 'allow'].some((term) => {
+        return new RegExp(`\\b${term}\\b`, 'g').test(text)
+      })) {
+        elem.click()
       }
     })
   })
