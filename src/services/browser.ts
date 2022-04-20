@@ -7,11 +7,15 @@ import { sleep } from 'utils/sleep'
 const log = Log('services/browser')
 
 let browser: Browser
-const UBLOCK_EXT = '/usr/src/app/uBlock0.chromium'
+const UBLOCK_EXT = '/usr/src/app/adblockplus'
 
 async function reOpenBrowser() {
-  await killBrowser(browser)
-  browser = await openBrowser()
+  try {
+    await killBrowser(browser)
+    browser = await openBrowser()
+  } catch {
+    process.exit(-1)
+  }
 }
 async function killBrowser(browser: Browser) {
   if (!browser) return
@@ -31,10 +35,12 @@ async function openBrowser() {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--start-maximized',
+      `--disable-extensions-except=${UBLOCK_EXT}`, 
       `--load-extension=${UBLOCK_EXT}`
     ]
   })
   const newPage = await browser.newPage()
+  await sleep(2000)
   const pages = await browser.pages()
   for(const page of pages) {
     if (page !== newPage) {
@@ -51,6 +57,14 @@ export async function newPage(url: string) {
   await acceptCookies(page)
   await clickPlay(page)
   return page
+}
+
+export async function runOnCurrentPage<A,T>(evaluate: (args: A) => Promise<T> | T, args: A) {
+  const pages = await browser.pages()
+  const page = pages[pages.length - 1]
+  const result = await page.evaluate<() => Promise<T> | T>(evaluate as any, args as any)
+  await sleep(1000)
+  return result
 }
 
 export async function scrapeFromPage<T>(url: string, evaluate: () => Promise<T> | T) {

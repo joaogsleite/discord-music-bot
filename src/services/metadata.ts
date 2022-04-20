@@ -37,14 +37,6 @@ async function getInfoFromUrl(url: string): Promise<IPlayItem | IPlayItem[] | un
           url: aElem.href,
         }))
       })
-    } else {
-      return await browser.scrapeFromPage(url, () => {
-        const aElems = Array.from(document.querySelectorAll('a#video-title')) as HTMLAnchorElement[]
-        return aElems.map((aElem) => ({
-          title: aElem.innerText,
-          url: aElem.href,
-        }))
-      })
     }
   } else {
     const title = await browser.getPageTitle(url)

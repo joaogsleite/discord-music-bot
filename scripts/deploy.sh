@@ -13,6 +13,6 @@ ssh -p $SSH_PORT $SSH_SERVER "
   rm -rf src/
 "
 
-FILES_TO_SEND="scripts/ src/ .dockerignore docker-compose.yml Dockerfile package-lock.json package.json tsconfig.json"
+FILES_TO_SEND="scripts/ src/ .dockerignore docker-compose.yml AdblockPlus.zip Dockerfile package-lock.json package.json tsconfig.json"
 tar czf - $FILES_TO_SEND | ssh -p $SSH_PORT $SSH_SERVER "cd $SSH_FOLDER && tar xvzf -"
 ssh -p $SSH_PORT $SSH_SERVER "cd $SSH_FOLDER && docker-compose down && docker-compose up -d --build"
