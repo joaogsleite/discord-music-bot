@@ -18,7 +18,7 @@ commandNames.forEach(async (commandName) => {
 })
 
 discord.getClient().on('messageCreate', async (message) => {
-  if (message.author.bot || message.channelId !== discord.getTextChannel()?.id) return
+  if (message.author.bot /*|| message.channelId !== discord.getTextChannel()?.id*/) return
   log('message received', message.content)
   try {
     if (message.content.startsWith('!')) {
