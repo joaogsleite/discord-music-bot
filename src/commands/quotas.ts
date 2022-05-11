@@ -8,15 +8,12 @@ export async function handler(message: Message, text: string) {
   message.channel.sendTyping()
   const plays = generatePlays()
   if (plays.length > 0) {
-    message.reply(`
-      Today's play:
-      ${plays.map((play) => {
+    message.reply(plays.map((play) => {
         return `${play.value}: ${play.players.map((userId) => {
           return `<@${userId}>`
-        }).join(' -> ')}`
-      }).join(`
-      `)}
-    `)
+        }).join(' => ')}`
+      }).join('\n')
+    )
   } else {
     message.reply('No sufficient players or quota')
   }
