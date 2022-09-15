@@ -32,7 +32,7 @@ export async function acceptCookies(page: Page) {
       Array.from(document.getElementsByTagName('button'))
     ).forEach((elem) => {
       const text = elem.innerText.toLowerCase();
-      if (['i agree'].some((term) => {
+      if (['accept', 'i agree'].some((term) => {
         return new RegExp(`\\b${term}\\b`, 'g').test(text)
       })) {
         elem.click()
