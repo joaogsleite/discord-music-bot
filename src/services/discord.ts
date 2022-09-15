@@ -9,6 +9,7 @@ let client: Client
 
 export async function init() {
   client = new Client({
+    restRequestTimeout: 60000,
     intents: [
       'GUILDS',
       'GUILD_MESSAGES',
