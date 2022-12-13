@@ -73,7 +73,7 @@ export async function play(item?: metadata.IPlayItem) {
 		try {
 			discordPlayer?.stop(true)
 			const page = await browserService.newPage(item.url)
-			page.on("framenavigated", () => checkQueue())
+			//page.on("framenavigated", () => checkQueue())
 			const audioResource = await createAudioResourceFromPage(page)
 			discordPlayer.play(audioResource)
 			playing = item
